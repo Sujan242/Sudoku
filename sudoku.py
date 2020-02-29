@@ -1,14 +1,14 @@
-board = [   [3, 0, 6, 5, 0, 8, 4, 0, 0],
-            [5, 2, 0, 0, 0, 0, 0, 0, 0],  
-            [0, 8, 7, 0, 0, 0, 0, 3, 1],  
-            [0, 0, 3, 0, 1, 0, 0, 8, 0],  
-            [9, 0, 0, 8, 6, 3, 0, 0, 5],  
-            [0, 5, 0, 0, 9, 0, 6, 0, 0],  
-            [1, 3, 0, 0, 0, 0, 2, 5, 0],  
-            [0, 0, 0, 0, 0, 0, 0, 7, 4],  
-            [0, 0, 5, 2, 0, 6, 3, 0, 0]
-        ]
-modifyList = []
+import math
+
+board =  [[8, 1, 0, 0, 3, 0, 0, 2, 7], 
+            [0, 6, 2, 0, 5, 0, 0, 9, 0], 
+            [0, 7, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 9, 0, 6, 0, 0, 1, 0, 0], 
+            [1, 0, 0, 0, 2, 0, 0, 0, 4], 
+            [0, 0, 8, 0, 0, 5, 0, 7, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 8, 0], 
+            [0, 2, 0, 0, 1, 0, 7, 5, 0], 
+            [3, 8, 0, 0, 7, 0, 0, 4, 2]]
 
 def printBoard(board):
     for i in range(len(board)):
@@ -19,52 +19,41 @@ def printBoard(board):
                 print("| ", end = "")
             print(board[i][j], end = ' ')
         print()
-printBoard(board)
 
-def isNumValid(board, row, column, num):
-    
+def isNumPossible(n, x, y):
+    global board
+    blockSize = int(math.sqrt(len(board)))
     for i in range(len(board)):
-        if num == board[i][column]:
-            return -1
+        if board[x][i] == n:
+            return False
+        if board[i][y] == n:
+            return False
+    for i in range(blockSize):
+        for j in range(blockSize):
+            if board[(x//blockSize)*blockSize + i][(y//blockSize)*blockSize + j] == n:
+                return False
 
-    for j in range(len(board[row])):
-        if num == board[row][j]:
-            return -1
-    squaresize = int(len(board) ** (0.5))
+    return True
 
-    for i in range( squaresize):
-        for j in range( squaresize):
-            if num == board[ (row // squaresize) * squaresize + i][(column // squaresize) * squaresize + j]:
-                return -1
-    
-    return 0
-
-def sudokuSolver(board, i, j, n):
-    
-    while i <= 9 :
-        while j <= 9:
-
+def sudoku():
+    global board
+    for i in range(len(board)):
+        for j in range(len(board[i])):
             if board[i][j] == 0:
-                while n <= 9:
-                    if isNumValid(board, i, j, n) == 0:
+                for n in range(1, len(board) + 1):
+                    if isNumPossible(n, i, j) == True:
                         board[i][j] = n
-                        modifyList.append([i, j, n])
-                        break
-                    if n == 9:
-                        itemp = modifyList[-1][0]
-                        jtemp = modifyList[-1][1]
-                        ntemp = modifyList[-1][2]
-                        board[itemp][jtemp] = 0
-                        modifyList.pop()
-                        
-                        return                  
-                    n += 1
+                        sudoku()
+                        board[i][j] = 0
+                return
+    
+    print("\nSolution is: ")
+    printBoard(board)
+  #  if input("more?") == 'n':
+   #     exit
 
-
-
-
-sudokuSolver(board, 0, 0, 1)
-print("--------------------")
-print("Solution:")
-print("--------------------")
+print("Trying to solve: \n")
 printBoard(board)
+
+sudoku()
+
